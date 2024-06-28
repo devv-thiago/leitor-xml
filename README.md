@@ -1,2 +1,1 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+Uma aplicação que resolve um problema real de leitura de XML e extração de informações contidas nos arquivos.
