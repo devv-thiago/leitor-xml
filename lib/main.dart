@@ -43,7 +43,7 @@ Future<void> writeInFile(String? filePath, Iterable<XmlElement> refNFeElements,
     Iterable<XmlElement> cProdElements) async {
   try {
     File file = File(filePath ??= "");
-    var writeFile = file.openWrite(mode: FileMode.writeOnly);
+    var writeFile = file.openWrite(mode: FileMode.writeOnlyAppend);
 
     var refNFeList = refNFeElements.toList();
     var cProdList = cProdElements.toList();
@@ -71,8 +71,10 @@ Future<void> processDirectory(String dirPath, String? destinoArq) async {
   var directory = Directory(dirPath);
 
   // Lista todos os arquivos XML no diretório
-  var xmlFiles =
-      directory.listSync().where((file) => file.path.endsWith('.xml')).toList();
+  var xmlFiles = await directory
+      .list()
+      .where((file) => file.path.endsWith('.xml'))
+      .toList();
 
   for (var xmlFile in xmlFiles) {
     String caminhoArq = xmlFile.path;
@@ -83,8 +85,12 @@ Future<void> processDirectory(String dirPath, String? destinoArq) async {
     Iterable<XmlElement> documentoXML3 =
         await readSpecificTag("cProd", caminhoArq);
 
-    // Grava os elementos encontrados em um arquivo.
-    await writeInFile(destinoArq, documentoXML2, documentoXML3);
+    if (documentoXML2.isNotEmpty && documentoXML3.isNotEmpty) {
+      // Grava os elementos encontrados em um arquivo.
+      await writeInFile(destinoArq, documentoXML2, documentoXML3);
+    } else {
+      stdout.writeln('Nenhum elemento encontrado em: $caminhoArq');
+    }
   }
   stdout.writeln('Dados escritos no arquivo: $dirPath');
 }
@@ -111,5 +117,4 @@ void main(List<String> arguments) async {
     // Processa todos os arquivos XML no diretório
     await processDirectory(caminhoDir, destinoArq);
   }
-  stdin.readLineSync();
 }
