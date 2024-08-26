@@ -28,7 +28,19 @@ Future<Iterable<XmlElement>> readSpecificTag(String tag, String caminho) async {
 Future<File> createFile(String? filePath) async {
   File file;
   try {
-    file = File(filePath!); // cria arquivo baseado na variável .ENV
+    if (filePath == null || filePath.isEmpty) {
+      throw Exception('O caminho do arquivo não pode ser nulo ou vazio.');
+    }
+
+    file = File(filePath);
+
+    // Verifica se o arquivo já existe antes de tentar excluí-lo
+    if (await file.exists()) {
+      await file.delete(); // Deleta o arquivo se ele existir
+      stdout.writeln("Arquivo existente deletado: $filePath");
+    }
+
+    // Cria um novo arquivo
     await file.create(recursive: true);
     stdout.writeln("Arquivo criado em: $filePath");
   } catch (e) {
