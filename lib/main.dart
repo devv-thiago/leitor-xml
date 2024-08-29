@@ -1,4 +1,3 @@
-import 'package:dotenv/dotenv.dart';
 import 'package:xml/xml.dart';
 import 'dart:io';
 
@@ -116,17 +115,22 @@ String formatInfo(String info, int inicioInfo, int fimInfo) {
 }
 
 void main(List<String> arguments) async {
-  var env = DotEnv(includePlatformEnvironment: true)..load();
-  String? caminhoDir = env['ORIGEM'];
-  String? destinoArq = env['DESTINO'];
+  if (arguments.length < 2) {
+    stdout.writeln('Uso: <executável> <caminhoOrigem> <caminhoDestino>');
+    return;
+  }
+
+  String caminhoDir = arguments[0];
+  String destinoArq = arguments[1];
+
   await createFile(destinoArq); // Cria arquivo.
 
-  // Validação se o caminho do diretório está vazio
-  if (caminhoDir == null) {
-    stdout.writeln("Caminho do diretório XML vazio, validar arquivo .ENV.");
-  } else {
-    stdout.writeln("Caminho do diretório XML encontrado.");
-    // Processa todos os arquivos XML no diretório
-    await processDirectory(caminhoDir, destinoArq);
-  }
+  stdout.writeln("Caminho do diretório XML: $caminhoDir");
+
+  // Processa todos os arquivos XML no diretório
+  await processDirectory(caminhoDir, destinoArq);
+
+  // Mantém o CMD aberto
+  stdout.writeln("Pressione Enter para sair...");
+  stdin.readLineSync();
 }
